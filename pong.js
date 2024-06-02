@@ -247,18 +247,3 @@ addEventListener("load", () => {
   requestAnimationFrame(draw);
 
 })
-
-function respondCanvas(){
-  var container = CANVAS.parentElement()
-  var d = Math.min(container.width(), container.height())
-  CANVAS.attr('width', d); //max width
-  CANVAS.attr('height', d); //set the height to the width to make a square
-
-  //Redraw & reposition content
-  var x = c.width();
-  var y = c.height();
-  CTX.clearRect( 0, 0, x, y); //fill the canvas
-
-
-}
-// $(window).resize( respondCanvas );
