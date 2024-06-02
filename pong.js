@@ -30,14 +30,14 @@ const DEADSPACE = undefined;
 const NEUTRAL = colorPalette.NeutralSpace;
 
 const ANGLE = Math.PI * 2 / 6
-const HEX_RADIUS_GAME = 3
+const HEX_RADIUS_GAME = 2
 const BALL_RADIUS_GAME = 1
 const SPEED = 0.2
-const LAYOUT = new Layout(Layout.flat,new Point(3,3), new Point(50,50))
+const LAYOUT = new Layout(Layout.flat,new Point(2,2), new Point(50,50))
 // pretend that the game field is from 0 -> +100 in both x and y
 // the game is 10 hex tall
 //
-const MAP_RADIUS = 9
+const MAP_RADIUS = 12
 
 function getScale() {
   return (Math.min(CANVAS.width, CANVAS.height)) / 100.0
@@ -100,7 +100,6 @@ function makeStartingPosition() {
 
 
 function bounce(ball, hex){
-  console.log('bouncing', )
   let hex_pix = LAYOUT.hexToPixel(hex)
   let normalx = -ball.x + hex_pix.x;
   let normaly = -ball.y + hex_pix.y;
@@ -109,12 +108,19 @@ function bounce(ball, hex){
   if (dotproduct < 0) {return}
   let ddx = normalx * dotproduct * 2.0 / normalLen
   let ddy = normaly * dotproduct * 2.0 / normalLen
-  ball.dx -= ddx + randomNum(-0.001, 0.001)
-  ball.dy -= ddy + randomNum(-0.001, 0.001)
+  ball.dx -= ddx + randomNum(-0.01, 0.01)
+  ball.dy -= ddy + randomNum(-0.01, 0.01)
 }
 
 function outOfBounds(ballAsHex) {
-  return ballAsHex.len() >= MAP_RADIUS
+  return ballAsHex.len() > MAP_RADIUS
+}
+function wallBounce(ball, ballAsHex) {
+  // let currspeed = vecLength(ball.dx, ball.dy)
+  // let mag = - (currspeed / (currspeed + vecLength(ball.x-50, ball.y-50)))
+  // ball.dx = (ball.dx + ball.x-50) * mag + randomNum(-0.001, 0.001)
+  // ball.dy = (ball.dy + ball.y-50) * mag + randomNum(-0.001, 0.001)
+  bounce(ball, ballAsHex.scale(2,2))
 }
 
 function updateBall(ball) {
@@ -127,18 +133,21 @@ const SAME_TEAM = {
   [TEAM2_BALL]: TEAM2,
 }
 
-
+const COLLISION_DIST = (HEX_RADIUS_GAME + BALL_RADIUS_GAME )
+function ballToHexDistance(ball, hex) {
+  let hex_centre = LAYOUT.hexToPixel(hex)
+  return vecLength(ball.x - hex_centre.x, ball.y - hex_centre.y)
+}
 function updateSquareAndBounce(ball) {
   let ballCentre = new Point(ball.x, ball.y)
   let ballAsHex = LAYOUT.pixelToHex(ballCentre)
   let hc = ballAsHex.round()
-  // if (outOfBounds(ballAsHex)){
-  //   let currentSpeed = vecLength(ball.dx, ball.dy)
-  //   let direction = new Point(ball.x, ball.y)
-  //   return
-  // }
+  if (outOfBounds(ballAsHex)){
+    wallBounce(ball, ballAsHex)
+    return
+  }
   for (const h of iterate_hex_neighbors(hc)){
-    if (ballAsHex.distance(h) > 0.8)  {continue}
+    if (ballToHexDistance(ball, h) > COLLISION_DIST)  {continue}
 
     if (!COLORS[h.q] || !COLORS[h.q][h.r] || COLORS[h.q][h.r] === DEADSPACE) {
       // DEADSPACE is undefined
