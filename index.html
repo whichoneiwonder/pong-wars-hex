@@ -15,16 +15,20 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: linear-gradient(to bottom, #172b36 0%, #d9e8e3 100%);
+        background: linear-gradient(to right, #172b36 0%, #d9e8e3 100%);
       }
 
       #container {
         display: flex;
-        width: 100%;
-        max-width: 750px;
+        width: calc(min(90vw, 1000px));
+        max-width: 1000px;
+        min-width: 400px;
         align-items: center;
         flex-direction: column;
-        height: 100%;
+        max-height: 1000px;
+        min-height: 400px;
+
+        height:  calc(min(90vw, 1000px));;
       }
 
       #pongCanvas {
@@ -36,20 +40,23 @@
         /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
       }
 
-      #score {
+      .score-chip {
+        text-align: center;
         font-family: monospace;
-        margin-top: 30px;
-        font-size: 20px;
-        padding-left: 20px;
+        background-color: azure;
+        margin: 30px;
+        padding: 20px;
+        border-radius: 30em;
+        border: 2px #172b36;
         color: #172b36;
       }
 
+      #score {
+        font-size: 26px;
+      }
+
       #made {
-        font-family: monospace;
-        margin-top: auto;
-        margin-bottom: 20px;
         font-size: 12px;
-        padding-left: 20px;
       }
 
       #made a {
@@ -60,12 +67,15 @@
 
   <body>
     <div id="container">
-      <canvas id="pongCanvas" width="800" height="800"></canvas>
-      <div id="score"></div>
-      <p id="made">
-        made by <a href="https://whichoneiwonder.com">whichoneiwonder</a>
-        | source on <a href="https://github.com/whichoneiwonder/pong-wars">github</a>
-      </p>
+      <canvas id="pongCanvas" width="1200" height="1200"></canvas>
+
+      <div class="score-chip">
+        <div id="score"></div>
+        <p id="made">
+          made by <a href="https://whichoneiwonder.com">whichoneiwonder</a>
+          | source on <a href="https://github.com/whichoneiwonder/pong-wars">github</a>
+        </p>
+      </div>
     </div>
   </body>
 

@@ -84,8 +84,8 @@ function*  iterate_hex_neighbors (hex) {
 // GAME UPDATE
 function makeStartingPosition() {
   BALLS.push(
-    Ball(25, 50, 3, 3, TEAM1_BALL),
-    Ball(75, 50, -3, -3, TEAM2_BALL),
+    Ball(25, 50, +3, randomNum(-2,2), TEAM1_BALL),
+    Ball(75, 50, -3, randomNum(-2,2), TEAM2_BALL),
   );
 
   for (const h of iterate_hex()) {
@@ -116,11 +116,9 @@ function outOfBounds(ballAsHex) {
   return ballAsHex.len() > MAP_RADIUS
 }
 function wallBounce(ball, ballAsHex) {
-  // let currspeed = vecLength(ball.dx, ball.dy)
-  // let mag = - (currspeed / (currspeed + vecLength(ball.x-50, ball.y-50)))
-  // ball.dx = (ball.dx + ball.x-50) * mag + randomNum(-0.001, 0.001)
-  // ball.dy = (ball.dy + ball.y-50) * mag + randomNum(-0.001, 0.001)
-  bounce(ball, ballAsHex.scale(2,2))
+  let mirror = ballAsHex.scale(1.2,1.2).round()
+  bounce(ball, mirror)
+  bounce(ball, mirror)
 }
 
 function updateBall(ball) {
@@ -144,7 +142,6 @@ function updateSquareAndBounce(ball) {
   let hc = ballAsHex.round()
   if (outOfBounds(ballAsHex)){
     wallBounce(ball, ballAsHex)
-    return
   }
   for (const h of iterate_hex_neighbors(hc)){
     if (ballToHexDistance(ball, h) > COLLISION_DIST)  {continue}
@@ -212,13 +209,17 @@ function drawHexagon(hex) {
   if (color === DEADSPACE) {return;}
   let hex_centre = gamePointToCanvasPoint(LAYOUT.hexToPixel(hex))
   let rad = HEX_RADIUS_GAME * getScale()
+  CTX.lineWidth = 1;
+  CTX.strokeStyle = NEUTRAL;
   CTX.beginPath();
+
   for (var i = 0; i < 6; i++) {
     CTX.lineTo(hex_centre.x + rad * Math.cos(ANGLE * i), hex_centre.y + rad * Math.sin(ANGLE * i));
   }
   CTX.fillStyle = color
   CTX.closePath();
   CTX.fill();
+  CTX.stroke()
   // CTX.font = "10px serif";
   // CTX.fillStyle = 'red'
   // CTX.fillText(`${hex.len()}`,hex_centre.x - rad/2, hex_centre.y);
@@ -246,3 +247,18 @@ addEventListener("load", () => {
   requestAnimationFrame(draw);
 
 })
+
+function respondCanvas(){
+  var container = CANVAS.parentElement()
+  var d = Math.min(container.width(), container.height())
+  CANVAS.attr('width', d); //max width
+  CANVAS.attr('height', d); //set the height to the width to make a square
+
+  //Redraw & reposition content
+  var x = c.width();
+  var y = c.height();
+  CTX.clearRect( 0, 0, x, y); //fill the canvas
+
+
+}
+// $(window).resize( respondCanvas );
