@@ -27,13 +27,13 @@ const TEAM2 = colorPalette.NocturnalExpedition;
 const TEAM2_BALL = colorPalette.MysticMint;
 
 const DEADSPACE = undefined;
-// const BORDER = colorPalette.Forsythia;
+const HIT = colorPalette.Forsythia;
 const NEUTRAL = colorPalette.NeutralSpace;
 
 const ANGLE = (Math.PI * 2) / 6;
 const HEX_RADIUS_GAME = 1;
-const BALL_RADIUS_GAME = 0.5;
-const SPEED = 0.2;
+const BALL_RADIUS_GAME = 0.75;
+const SPEED = 0.25;
 const LAYOUT = new Layout(Layout.flat, new Point(1, 1), new Point(50, 50));
 // pretend that the game field is from 0 -> +100 in both x and y
 // the game is 10 hex tall
@@ -59,7 +59,7 @@ function randomNum(min, max) {
 
 //GAME OBJECTS
 const COLORS = new Map([[0, [new Map([[0, NEUTRAL]])]]]);
-
+const RECENTS = []
 function Ball(x, y, dx, dy, c) {
   return { x, y, dx, dy, c };
 }
@@ -161,8 +161,9 @@ function updateSquareAndBounce(ball) {
     let currentColor = COLORS[h.q][h.r];
     if (currentColor !== SAME_TEAM[ball.c]) {
       COLORS[h.q][h.r] = SAME_TEAM[ball.c];
-      drawHexagon(h, colorPalette.DeepSaffron);
+      drawHexagon(h, HIT);
       bounce(ball, h);
+      RECENTS.push(h)
     }
   }
 }
@@ -232,8 +233,8 @@ function drawHexagon(hex, override_color) {
   }
   let hex_centre = gamePointToCanvasPoint(LAYOUT.hexToPixel(hex));
   let rad = HEX_RADIUS_GAME * getScale();
-  CTX.lineWidth = 1;
-  CTX.strokeStyle = NEUTRAL;
+  CTX.lineWidth = 0.2;
+  CTX.strokeStyle = color;
   CTX.beginPath();
 
   for (var i = 0; i < 6; i++) {
@@ -254,7 +255,11 @@ function firstDraw() {
 }
 function draw() {
   updateScoreElement();
-
+  while(true){
+    let r = RECENTS.pop()
+    if (!r){ break}
+    drawHexagon(r)
+  }
   BALLS.forEach((ball) => {
     drawAroundBall(ball);
     updateSquareAndBounce(ball);
