@@ -1,85 +1,80 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Pong wars (Hex mode) | whichoneiwonder</title>
-    <link rel="canonical" href="https://pong-wars.whichoneiwonder.com/" />
-    <style>
-      html {
-        height: 100%;
-      }
 
-      body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(to right, #172b36 0%, #d9e8e3 100%);
-      }
+<head>
+  <title>Pong wars (Hex mode) | whichoneiwonder</title>
+  <link rel="canonical" href="https://pong-wars.whichoneiwonder.com/" />
+  <style>
+    html {
+      /* width: 100%; */
+    }
+    body {
+      max-width: 100vw;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #18687c 0%, #d9e8e3 100%);
+    }
 
-      #container {
-        display: flex;
-        width: calc(min(90vw, 1000px));
-        max-width: 1000px;
-        min-width: 400px;
-        align-items: center;
-        flex-direction: column;
-        max-height: 1000px;
-        min-height: 400px;
+    #container {
+      display: block;
+      margin: auto;
+      width: calc(min(70vh, min(90vw, 750px)));
+      min-width: 400px;
+      max-width: 750px;
+      min-height: 400px;
+      max-height: 750px;
+    }
 
-        height:  calc(min(90vw, 1000px));;
-      }
+    #pongCanvas {
+      display: block;
+      border-radius: 4px;
+      overflow: hidden;
+      width: 100%;
+      max-height: 100%;
+      height: 100%;
+      /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
+    }
 
-      #pongCanvas {
-        display: block;
-        border-radius: 4px;
-        overflow: hidden;
-        width: 100%;
-        margin-top: auto;
-        /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
-      }
+    .score-chip {
+      text-align: center;
+      font-family: monospace;
+      margin: auto;
+      padding: 20px;
+      border-radius: 2em;
+      border: 2px #172b36;
+      color: #172b36;
+    }
 
-      .score-chip {
-        text-align: center;
-        font-family: monospace;
-        background-color: azure;
-        margin: 30px;
-        padding: 20px;
-        border-radius: 30em;
-        border: 2px #172b36;
-        color: #172b36;
-      }
+    #score {
+      font-size: 1.6em;
+    }
 
-      #score {
-        font-size: 26px;
-      }
+    #made {
+      font-size: 0.8em;
+    }
 
-      #made {
-        font-size: 12px;
-      }
+    #made a {
+      color: #091115;
+    }
+  </style>
+</head>
 
-      #made a {
-        color: #172b36;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="container">
-      <canvas id="pongCanvas" width="1200" height="1200"></canvas>
-
-      <div class="score-chip">
-        <div id="score"></div>
-        <p id="made">
-          made by <a href="https://whichoneiwonder.com">whichoneiwonder</a>
-          | source on <a href="https://github.com/whichoneiwonder/pong-wars">github</a>
-        </p>
-      </div>
+<body>
+  <div id="container">
+    <canvas id="pongCanvas" width="1200" height="1200"></canvas>
+    <div class="score-chip">
+      <span id="score">Day | Night</span>
+      <br />
+      <span id="made">
+        made by <a href="https://whichoneiwonder.com">whichoneiwonder</a>
+        | source on <a href="https://github.com/whichoneiwonder/pong-wars">github</a>
+      </span>
     </div>
-  </body>
+  </div>
+</body>
 
-  <script src="red-blob-hex/lib.js" ></script>
-  <script src="pong.js" ></script>
-  <!-- <script src="pong.js" ></script> -->
+<script src="red-blob-hex/lib.js"></script>
+<script src="pong.js"></script>
+<!-- <script src="pong.js" ></script> -->
+
 </html>
