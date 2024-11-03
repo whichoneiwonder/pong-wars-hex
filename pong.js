@@ -439,10 +439,10 @@ function draw() {
   requestAnimationFrame(draw);
 }
 addEventListener("load", () => {
-  console.log("starting", window.location.hash);
-  if (window.location.hash === "#ThreePlayer") {
+  console.log("starting", window.location.search);
+  if (window.location.search === "?ThreePlayer") {
     makeStartingPositionThreePlayer();
-  } else if (window.location.hash === "#SixPlayer") {
+  } else if (window.location.search === "?SixPlayer") {
     makeStartingPositionSixPlayer();
   } else {
     makeStartingPosition();
