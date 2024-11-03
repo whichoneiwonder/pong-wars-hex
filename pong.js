@@ -1,5 +1,3 @@
-
-
 // const { Hex, Layout } = require("./red-blob-hex/lib");
 
 // Source palette: https://twitter.com/AlexCristache/status/1738610343499157872
@@ -89,9 +87,36 @@ function randomNum(min, max) {
 
 //GAME OBJECTS
 const COLORS = new Map([
-  [0, [new Map([[1, NEUTRAL], [0, NEUTRAL], [-1, NEUTRAL]])]],
-  [1, [new Map([[1, NEUTRAL], [0, NEUTRAL], [-1, NEUTRAL]])]],
-  [-1, [new Map([[1, NEUTRAL], [0, NEUTRAL], [-1, NEUTRAL]])]],
+  [
+    0,
+    [
+      new Map([
+        [1, NEUTRAL],
+        [0, NEUTRAL],
+        [-1, NEUTRAL],
+      ]),
+    ],
+  ],
+  [
+    1,
+    [
+      new Map([
+        [1, NEUTRAL],
+        [0, NEUTRAL],
+        [-1, NEUTRAL],
+      ]),
+    ],
+  ],
+  [
+    -1,
+    [
+      new Map([
+        [1, NEUTRAL],
+        [0, NEUTRAL],
+        [-1, NEUTRAL],
+      ]),
+    ],
+  ],
 ]);
 for (const c of Hex.directions) {
   for (let r = 1; r <= MAP_RADIUS; r++) {
@@ -145,7 +170,9 @@ function* iterate_hex_slice_inner(
     next_layer = [start_group[0].add(edge.rotateLeft()), ...next_layer];
   }
   if (mode > 1) {
-    next_layer.push(start_group[start_group.length - 1].add(edge.rotateRight()));
+    next_layer.push(
+      start_group[start_group.length - 1].add(edge.rotateRight())
+    );
   }
   yield* next_layer;
   yield* iterate_hex_slice_inner(next_layer, direction, more_layers - 1, mode);
@@ -187,7 +214,6 @@ const threePlayerNeutral = (h) =>
   (h.s === 0 && h.q > h.r);
 
 function makeStartingPositionThreePlayer() {
-
   for (const i in [0, 1, 2]) {
     wedgeDir = Hex.directions[2 * i];
     coords = LAYOUT.hexToPixel(wedgeDir.scale(10));
@@ -300,7 +326,7 @@ function updateSquareAndBounce(ball) {
     let currentColor = COLORS[h.q][h.r];
     if (currentColor === NEUTRAL || currentColor !== SAME_TEAM[ball.c]) {
       COLORS[h.q][h.r] = SAME_TEAM[ball.c];
-      drawHexagon(h, 'black');
+      drawHexagon(h, "black");
       bounce(ball, h);
       RECENTS.push(h);
     }
