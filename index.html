@@ -56,19 +56,36 @@
     #made a {
       color: #091115;
     }
-  </style>
-</head>
+      .score-chip >*> a {
+        color: #172b36;
+      }
+    </style>
+  </head>
 
-<body>
-  <div id="container">
-    <canvas id="pongCanvas" width="1200" height="1200"></canvas>
-    <div class="score-chip">
-      <span id="score">Day | Night</span>
-      <br />
-      <span id="made">
-        made by <a href="https://whichoneiwonder.com">whichoneiwonder</a>
-        | source on <a href="https://github.com/whichoneiwonder/pong-wars">github</a>
-      </span>
+  <body>
+    <div id="container">
+      <canvas id="pongCanvas" width="1200" height="1200"></canvas>
+
+      <div class="score-chip">
+        <div id="score"></div>
+        <p id="made">
+          made by <a href="https://whichoneiwonder.com">whichoneiwonder</a>
+          | source on <a href="https://github.com/whichoneiwonder/pong-wars">github</a>
+        </p>
+        <p id="other-modes">
+
+          &nbsp;
+            <a target="_blank" href="#">classic mode</a>
+           &nbsp;|&nbsp;
+
+            <a target="_blank" href="#ThreePlayer">three player</a>
+            &nbsp;|&nbsp;
+
+            <a target="_blank" href="#SixPlayer">six players</a>
+            &nbsp;
+      </p>
+
+      </div>
     </div>
   </div>
 </body>

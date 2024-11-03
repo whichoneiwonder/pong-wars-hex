@@ -1,4 +1,6 @@
-// const { Hex } = require("./red-blob-hex/lib");
+
+
+// const { Hex, Layout } = require("./red-blob-hex/lib");
 
 // Source palette: https://twitter.com/AlexCristache/status/1738610343499157872
 const colorPalette = {
@@ -8,8 +10,14 @@ const colorPalette = {
   DeepSaffron: "#FF9932",
   NocturnalExpedition: "#114C5A",
   OceanicNoir: "#172B36",
-  NeutralSpace: "gray",
+  NeutralSpace: "#555555",
   NullSpace: "rgba(0 0 0 0)",
+  DarkRed: "#c42929",
+  Green: "#29c429",
+  Blue: "#2929c4",
+  Yellow: "#ebd50f",
+  Cyan: "#0febd5",
+  Magenta: "#d50feb",
 };
 
 // Idea for Pong wars: https://twitter.com/nicolasdnl/status/1749715070928433161
@@ -20,15 +28,37 @@ const CANVAS = document.getElementById("pongCanvas");
 const CTX = CANVAS.getContext("2d");
 const scoreElement = document.getElementById("score");
 
+// 1v1 team colors
 const TEAM1 = colorPalette.MysticMint;
 const TEAM1_BALL = colorPalette.NocturnalExpedition;
 
 const TEAM2 = colorPalette.NocturnalExpedition;
 const TEAM2_BALL = colorPalette.MysticMint;
 
+// 3 player team colors
+const COLORS_3_TEAMS = [
+  colorPalette.Yellow,
+  colorPalette.Cyan,
+  colorPalette.Magenta,
+];
+const COLORS_3_BALLS = [
+  colorPalette.Blue,
+  colorPalette.DarkRed,
+  colorPalette.Green,
+];
+
+// 6 player team colors
+const HSL_6_TEAM_COLORS = [10, 70, 130, 190, 250, 310].map(
+  (x) => `hsl(${x}, 70%, 50%)`
+);
+const HSL_6_BALL_COLORS = [190, 250, 310, 10, 70, 130].map(
+  (x) => `hsl(${x}, 80%, 60%)`
+);
+
 const DEADSPACE = undefined;
 const HIT = colorPalette.Forsythia;
 const NEUTRAL = colorPalette.NeutralSpace;
+// const NEUTRAL = colorPalette.NullSpace;
 
 const ANGLE = (Math.PI * 2) / 6;
 const HEX_RADIUS_GAME = 1;
@@ -58,8 +88,19 @@ function randomNum(min, max) {
 }
 
 //GAME OBJECTS
-const COLORS = new Map([[0, [new Map([[0, NEUTRAL]])]]]);
-const RECENTS = []
+const COLORS = new Map([
+  [0, [new Map([[1, NEUTRAL], [0, NEUTRAL], [-1, NEUTRAL]])]],
+  [1, [new Map([[1, NEUTRAL], [0, NEUTRAL], [-1, NEUTRAL]])]],
+  [-1, [new Map([[1, NEUTRAL], [0, NEUTRAL], [-1, NEUTRAL]])]],
+]);
+for (const c of Hex.directions) {
+  for (let r = 1; r <= MAP_RADIUS; r++) {
+    let h = c.scale(r);
+    COLORS[h.q] = COLORS[h.q] || new Map();
+    COLORS[h.q][h.r] = NEUTRAL;
+  }
+}
+const RECENTS = [];
 function Ball(x, y, dx, dy, c) {
   return { x, y, dx, dy, c };
 }
@@ -77,6 +118,44 @@ function* iterate_hex_neighbors(hex) {
   for (const d in Hex.directions) {
     yield hex.neighbor(d);
   }
+}
+
+function* iterate_hex_slice_3(start, direction, radius = MAP_RADIUS) {
+  if (start.len() > radius) {
+    return;
+  }
+  yield start;
+  yield* iterate_hex_slice_inner([start], direction, radius - start.len(), 3);
+}
+
+function* iterate_hex_slice_inner(
+  start_group,
+  direction,
+  more_layers,
+  mode = 1
+) {
+  if (more_layers <= 0) {
+    return;
+  }
+
+  const edge = Hex.directions[direction];
+  // const rightEdge = edge.rotateLeft();
+  let next_layer = [...start_group.map((start) => start.add(edge))];
+  if (mode > 2) {
+    next_layer = [start_group[0].add(edge.rotateLeft()), ...next_layer];
+  }
+  if (mode > 1) {
+    next_layer.push(start_group[start_group.length - 1].add(edge.rotateRight()));
+  }
+  yield* next_layer;
+  yield* iterate_hex_slice_inner(next_layer, direction, more_layers - 1, mode);
+}
+function* iterate_hex_slice_6(start, direction, radius = MAP_RADIUS) {
+  if (start.len() > radius) {
+    return;
+  }
+  yield start;
+  yield* iterate_hex_slice_inner([start], direction, radius - start.len(), 2);
 }
 
 // GAME UPDATE
@@ -99,6 +178,60 @@ function makeStartingPosition() {
       COLORS[h.q] = new Map();
     }
     COLORS[h.q][h.r] = c;
+  }
+}
+
+const threePlayerNeutral = (h) =>
+  (h.q === 0 && h.r > h.s) ||
+  (h.r === 0 && h.s > h.q) ||
+  (h.s === 0 && h.q > h.r);
+
+function makeStartingPositionThreePlayer() {
+
+  for (const i in [0, 1, 2]) {
+    wedgeDir = Hex.directions[2 * i];
+    coords = LAYOUT.hexToPixel(wedgeDir.scale(10));
+    BALLS.push(
+      Ball(
+        coords.x,
+        coords.y,
+        randomNum(-3, 3),
+        randomNum(-3, 3),
+        COLORS_3_BALLS[i]
+      )
+    );
+    for (const n of iterate_hex_slice_3(wedgeDir, 2 * i)) {
+      if (n.len() <= MAP_RADIUS) {
+        COLORS[n.q] = COLORS[n.q] || new Map();
+        COLORS[n.q][n.r] = COLORS_3_TEAMS[i];
+      } else {
+        break;
+      }
+    }
+  }
+}
+
+function makeStartingPositionSixPlayer() {
+  COLORS[0][0] = NEUTRAL;
+
+  for (const i in [0, 1, 2, 3, 4, 5]) {
+    const wedgeDir = Hex.directions[i].add(Hex.directions[i].rotateRight());
+    coords = LAYOUT.hexToPixel(wedgeDir.scale(3));
+    BALLS.push(
+      Ball(
+        coords.x,
+        coords.y,
+        randomNum(-3, 3),
+        randomNum(-3, 3),
+        HSL_6_BALL_COLORS[i]
+      )
+    );
+    for (const h of iterate_hex_slice_6(wedgeDir, i)) {
+      if (!COLORS[h.q]) {
+        COLORS[h.q] = new Map();
+      }
+      COLORS[h.q][h.r] = HSL_6_TEAM_COLORS[i];
+    }
   }
 }
 
@@ -134,6 +267,12 @@ function updateBall(ball) {
 const SAME_TEAM = {
   [TEAM1_BALL]: TEAM1,
   [TEAM2_BALL]: TEAM2,
+  ...Object.fromEntries(
+    [0, 1, 2].map((i) => [COLORS_3_BALLS[i], COLORS_3_TEAMS[i]])
+  ),
+  ...Object.fromEntries(
+    [0, 1, 2, 3, 4, 5].map((i) => [HSL_6_BALL_COLORS[i], HSL_6_TEAM_COLORS[i]])
+  ),
 };
 
 const COLLISION_DIST = HEX_RADIUS_GAME + BALL_RADIUS_GAME;
@@ -159,11 +298,11 @@ function updateSquareAndBounce(ball) {
       continue;
     }
     let currentColor = COLORS[h.q][h.r];
-    if (currentColor !== SAME_TEAM[ball.c]) {
+    if (currentColor === NEUTRAL || currentColor !== SAME_TEAM[ball.c]) {
       COLORS[h.q][h.r] = SAME_TEAM[ball.c];
-      drawHexagon(h, HIT);
+      drawHexagon(h, 'black');
       bounce(ball, h);
-      RECENTS.push(h)
+      RECENTS.push(h);
     }
   }
 }
@@ -226,17 +365,17 @@ function drawHexBackground() {
   CTX.closePath();
   CTX.fill();
 }
-function drawHexagon(hex, override_color) {
+function drawHexagon(hex, override_color = undefined) {
   let color = override_color || (COLORS[hex.q] || {})[hex.r] || DEADSPACE;
   if (color === DEADSPACE) {
     color = NEUTRAL;
   }
   let hex_centre = gamePointToCanvasPoint(LAYOUT.hexToPixel(hex));
   let rad = HEX_RADIUS_GAME * getScale();
-  CTX.lineWidth = 0.2;
-  CTX.strokeStyle = color;
+  CTX.lineWidth = 0.3;
   CTX.beginPath();
 
+  CTX.strokeStyle = color;
   for (var i = 0; i < 6; i++) {
     CTX.lineTo(
       hex_centre.x + rad * Math.cos(ANGLE * i),
@@ -249,16 +388,18 @@ function drawHexagon(hex, override_color) {
   CTX.stroke();
 }
 function firstDraw() {
-  updateScoreElement();
+  // updateScoreElement();
   drawHexBackground();
   drawAllHexagons();
 }
 function draw() {
-  updateScoreElement();
-  while(true){
-    let r = RECENTS.pop()
-    if (!r){ break}
-    drawHexagon(r)
+  // updateScoreElement();
+  while (true) {
+    let r = RECENTS.pop();
+    if (!r) {
+      break;
+    }
+    drawHexagon(r);
   }
   BALLS.forEach((ball) => {
     drawAroundBall(ball);
@@ -272,8 +413,14 @@ function draw() {
   requestAnimationFrame(draw);
 }
 addEventListener("load", () => {
-  console.log("starting");
-  makeStartingPosition();
+  console.log("starting", window.location.hash);
+  if (window.location.hash === "#ThreePlayer") {
+    makeStartingPositionThreePlayer();
+  } else if (window.location.hash === "#SixPlayer") {
+    makeStartingPositionSixPlayer();
+  } else {
+    makeStartingPosition();
+  }
   firstDraw();
   requestAnimationFrame(draw);
 });
