@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 
 <head>
   <title>Pong wars (Hex mode) | whichoneiwonder</title>
@@ -10,13 +10,13 @@
   <meta property="og:title" content="Pong wars (Hex mode) | whichoneiwonder" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://pong-wars-hex.whichoneiwonder.com/" />
-  <meta property="og:image" content="https://pong-wars-hex.whichoneiwonder.com/hero2.png" />
+  <meta property="og:image" content="https://pong-wars-hex.whichoneiwonder.com/hero3.png" />
   <meta property="og:description" content="Play Pong wars in Hex mode by whichoneiwonder" />
 <!-- Twitter -->
-  <meta name="twitter:card" content="https://pong-wars-hex.whichoneiwonder.com/hero2.png">
+  <meta name="twitter:card" content="https://pong-wars-hex.whichoneiwonder.com/hero3.png">
   <meta name="twitter:title" content="Pong wars (Hex mode) | whichoneiwonder">
   <meta name="twitter:description" content="Play Pong wars in Hex mode by whichoneiwonder">
-  <meta name="twitter:image" content="https://pong-wars-hex.whichoneiwonder.com/hero2.png">
+  <meta name="twitter:image" content="https://pong-wars-hex.whichoneiwonder.com/hero3.png">
 <!-- Schema.org metadata -->
   <script type="application/ld+json">
   {
@@ -34,17 +34,33 @@
   }
   </script>
   <style>
-
-    html {
-      max-width: 100vw;
+    body {
       margin: 0;
       padding: 0;
-      background: content-box linear-gradient(to right, #7ccfe4 5%,#18687c 20%,#18687c 80%, #7ccfe4 95%);
-      /* overflow-x: hidden; */
       font-size: 16px; /*calc(max(16px, min(1.8em, 20px)));*/
       font-family: monospace;
     }
-
+    .three-player-background {
+      background:
+        radial-gradient(closest-side, transparent 90%, white),
+        conic-gradient( from 300deg, yellow 10deg, magenta 110deg 130deg, cyan 230deg 250deg,  yellow 350deg)
+        ;
+      background-blend-mode:hard-light, normal;
+      background-clip: border-box;
+      color: transparent;
+      border-radius: 50%;
+    }
+    .score-chip {
+      text-align: center;
+      margin: auto;
+      padding: 20px;
+      border-radius: 2em;
+      border: 2px #172b36;
+      color: #172b36;
+    }
+    .score-chip>*>a {
+      color: #0e3449;
+    }
     #container {
       display: block;
       margin: auto;
@@ -64,29 +80,30 @@
       height: 100%;
       /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
     }
-
-    .score-chip {
-      text-align: center;
-      margin: auto;
-      padding: 20px;
-      border-radius: 2em;
-      border: 2px #172b36;
-      color: #172b36;
-    }
-
-    #made a {
-      color: #091115;
-    }
-
-    .score-chip>*>a {
-      color: #172b36;
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: black;
+        color: white;
+      }
+      .three-player-background {
+        background:
+          radial-gradient(closest-side, transparent 80%, black),
+          conic-gradient( from 300deg, #eeff35 10deg, #ff35ee 110deg 130deg, #35eeff 230deg 250deg,  #eeff35 350deg)
+          ;
+      }
+      .score-chip{
+        color: #ffffff;
+      }
+      .score-chip>*>a {
+        color: #81cfff;
+      }
     }
   </style>
 </head>
 
 <body>
   <div id="container">
-    <canvas id="pongCanvas" width="1200" height="1200"></canvas>
+    <canvas id="pongCanvas" class="three-player-background" width="1200" height="1200"></canvas>
 
     <div class="score-chip">
       <div id="score"></div>

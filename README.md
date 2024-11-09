@@ -2,7 +2,7 @@
 
 ![Hero Image](./hero.png)
 
-Welcome to Pong Wars Hex! This is a simple and fun website that you can stare at for hours.
+Welcome to Pong Wars Hex! This is a simple and fun website that you can stare at for hours. It is hosted [Here](https://hex-pong-wars.whichoneiwonder.com/)
 
 ## About
 
