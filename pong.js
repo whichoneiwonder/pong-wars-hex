@@ -10,9 +10,9 @@ const colorPalette = {
   OceanicNoir: "#172B36",
   NeutralSpace: "#555555",
   NullSpace: "rgba(0 0 0 0)",
-  DarkRed: "#c42929",
-  Green: "#29c429",
-  Blue: "#2929c4",
+  DarkRed: "#e44949dd",
+  Green: "#49e449dd",
+  Blue: "#4949e4dd",
   Yellow: "#ebd50f",
   Cyan: "#0febd5",
   Magenta: "#d50feb",
@@ -47,26 +47,27 @@ const COLORS_3_BALLS = [
 
 // 6 player team colors
 const HSL_6_TEAM_COLORS = [10, 70, 130, 190, 250, 310].map(
-  (x) => `hsl(${x}, 70%, 50%)`
+  (x) => `hsl(${x + 10}, 90%, 50%)`
 );
 const HSL_6_BALL_COLORS = [190, 250, 310, 10, 70, 130].map(
-  (x) => `hsl(${x}, 80%, 60%)`
+  (x) => `hsl(${x + 10}, 100%, 70%)`
 );
 
 const DEADSPACE = undefined;
 const HIT = colorPalette.Forsythia;
 const NEUTRAL = colorPalette.NeutralSpace;
 // const NEUTRAL = colorPalette.NullSpace;
-
+const CLASSIC_MODE = window.location.search.toLowerCase() === "?classic";
+const SOLID_HEX = CLASSIC_MODE || !window.location.hash;
 const ANGLE = (Math.PI * 2) / 6;
-const HEX_RADIUS_GAME = 1;
+const HEX_RADIUS_GAME = SOLID_HEX ? 1 : 0.9;
 const BALL_RADIUS_GAME = 0.75;
 const SPEED = 0.25;
 const LAYOUT = new Layout(Layout.flat, new Point(1, 1), new Point(50, 50));
 // pretend that the game field is from 0 -> +100 in both x and y
 // the game is 10 hex tall
 //
-const MAP_RADIUS = 24;
+const MAP_RADIUS = 20;
 
 function getScale() {
   return Math.min(CANVAS.width, CANVAS.height) / 100.0;
@@ -132,8 +133,9 @@ function Ball(x, y, dx, dy, c) {
 const BALLS = [];
 
 function* iterate_hex(radius = MAP_RADIUS) {
+  radius++;
   for (let q = -radius; q <= radius; q++) {
-    for (let r = -radius; r <= radius; r++) {
+    for (let r = -radius; r <= radius; ++r) {
       yield new Hex(q, r, -q - r);
     }
   }
@@ -362,6 +364,9 @@ function drawAroundBall(ball) {
   let ballCentre = new Point(ball.x, ball.y);
   let ballAsHex = LAYOUT.pixelToHex(ballCentre);
   let hc = ballAsHex.round();
+  let radius = (0.2 + BALL_RADIUS_GAME) * getScale();
+  let { x, y } = gamePointToCanvasPoint(ballCentre);
+  CTX.clearRect(x - radius, y - radius, radius * 2, radius * 2);
 
   if (hc.len() <= MAP_RADIUS + 1) {
     drawHexagon(hc);
@@ -373,13 +378,13 @@ function drawAroundBall(ball) {
 
 function drawAllHexagons() {
   for (const h of iterate_hex()) {
-    if (h.len() <= MAP_RADIUS) drawHexagon(h);
+    if (h.len() <= MAP_RADIUS + 1) drawHexagon(h);
   }
 }
 
 function drawHexBackground() {
   let hex_centre = gamePointToCanvasPoint({ x: 50, y: 50 });
-  let rad = HEX_RADIUS_GAME * (MAP_RADIUS - 1.6) * 2 * getScale();
+  let rad = HEX_RADIUS_GAME * (MAP_RADIUS - 1.7) * 2 * getScale();
   CTX.beginPath();
   for (var i = 0; i < 6; i++) {
     CTX.lineTo(
@@ -397,25 +402,35 @@ function drawHexagon(hex, override_color = undefined) {
     color = NEUTRAL;
   }
   let hex_centre = gamePointToCanvasPoint(LAYOUT.hexToPixel(hex));
-  let rad = HEX_RADIUS_GAME * getScale();
-  CTX.lineWidth = 0.3;
-  CTX.beginPath();
 
-  CTX.strokeStyle = color;
-  for (var i = 0; i < 6; i++) {
-    CTX.lineTo(
-      hex_centre.x + rad * Math.cos(ANGLE * i),
-      hex_centre.y + rad * Math.sin(ANGLE * i)
-    );
-  }
+  CTX.lineWidth = 1;
+  CTX.strokeStyle = "transparent";
   CTX.fillStyle = color;
+
+  if (SOLID_HEX) {
+    CTX.strokeStyle = color;
+  }
+  CTX.beginPath();
+  if (true) {
+    let rad = HEX_RADIUS_GAME * getScale();
+    for (var i = 0; i < 6; i++) {
+      CTX.lineTo(
+        hex_centre.x + rad * Math.cos(ANGLE * i),
+        hex_centre.y + rad * Math.sin(ANGLE * i)
+      );
+    }
+  } else {
+    let rad = (HEX_RADIUS_GAME  ) * getScale();
+
+    CTX.arc(hex_centre.x, hex_centre.y, rad, 0, Math.PI * 2, false);
+  }
   CTX.closePath();
   CTX.fill();
   CTX.stroke();
 }
 function firstDraw() {
   // updateScoreElement();
-  drawHexBackground();
+  // drawHexBackground();
   drawAllHexagons();
 }
 function draw() {
