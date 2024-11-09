@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <title>Pong wars (Hex mode) | whichoneiwonder</title>
   <link rel="canonical" href="https://pong-wars-hex.whichoneiwonder.com/" />
   <link rel="icon" type="image/png" href="/favicon.png">
+  <meta name="viewport" content="width=device-width">
+<!-- Open Graph properties -->
   <meta property="og:title" content="Pong wars (Hex mode) | whichoneiwonder" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://pong-wars-hex.whichoneiwonder.com/" />
   <meta property="og:image" content="https://pong-wars-hex.whichoneiwonder.com/hero2.png" />
   <meta property="og:description" content="Play Pong wars in Hex mode by whichoneiwonder" />
+<!-- Twitter -->
   <meta name="twitter:card" content="https://pong-wars-hex.whichoneiwonder.com/hero2.png">
   <meta name="twitter:title" content="Pong wars (Hex mode) | whichoneiwonder">
   <meta name="twitter:description" content="Play Pong wars in Hex mode by whichoneiwonder">
   <meta name="twitter:image" content="https://pong-wars-hex.whichoneiwonder.com/hero2.png">
+<!-- Schema.org metadata -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -31,20 +35,23 @@
   </script>
   <style>
 
-    body {
+    html {
       max-width: 100vw;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to right, #18687c 0%, #d9e8e3 100%);
+      background: content-box linear-gradient(to right, #7ccfe4 5%,#18687c 20%,#18687c 80%, #7ccfe4 95%);
+      /* overflow-x: hidden; */
+      font-size: 16px; /*calc(max(16px, min(1.8em, 20px)));*/
+      font-family: monospace;
     }
 
     #container {
       display: block;
       margin: auto;
       width: calc(min(80vh, 100vw));
-      min-width: 400px;
+      min-width: 200px;
       max-width: 1200px;
-      min-height: 400px;
+      min-height: 200px;
       max-height: 750px;
     }
 
@@ -60,13 +67,11 @@
 
     .score-chip {
       text-align: center;
-      font-family: monospace;
       margin: auto;
       padding: 20px;
       border-radius: 2em;
       border: 2px #172b36;
       color: #172b36;
-      font-size: calc(max(16px, min(1.8em, 20px)))
     }
 
     #made a {
