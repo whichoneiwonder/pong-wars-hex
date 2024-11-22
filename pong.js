@@ -87,38 +87,7 @@ function randomNum(min, max) {
 }
 
 //GAME OBJECTS
-const COLORS = new Map([
-  [
-    0,
-    [
-      new Map([
-        [1, NEUTRAL],
-        [0, NEUTRAL],
-        [-1, NEUTRAL],
-      ]),
-    ],
-  ],
-  [
-    1,
-    [
-      new Map([
-        [1, NEUTRAL],
-        [0, NEUTRAL],
-        [-1, NEUTRAL],
-      ]),
-    ],
-  ],
-  [
-    -1,
-    [
-      new Map([
-        [1, NEUTRAL],
-        [0, NEUTRAL],
-        [-1, NEUTRAL],
-      ]),
-    ],
-  ],
-]);
+const COLORS = new Map([[0, new Map([[0, NEUTRAL]])]]);
 for (const c of Hex.directions) {
   for (let r = 1; r <= MAP_RADIUS; r++) {
     let h = c.scale(r);
@@ -135,7 +104,7 @@ const BALLS = [];
 function* iterate_hex(radius = MAP_RADIUS) {
   radius++;
   for (let q = -radius; q <= radius; q++) {
-    for (let r = -radius; r <= radius; ++r) {
+    for (let r = -radius; r <= radius; r++) {
       yield new Hex(q, r, -q - r);
     }
   }
@@ -211,6 +180,7 @@ function makeStartingPosition() {
 }
 
 const threePlayerNeutral = (h) =>
+  (h.q === 0 && h.r === 0) ||
   (h.q === 0 && h.r > h.s) ||
   (h.r === 0 && h.s > h.q) ||
   (h.s === 0 && h.q > h.r);
@@ -420,7 +390,7 @@ function drawHexagon(hex, override_color = undefined) {
       );
     }
   } else {
-    let rad = (HEX_RADIUS_GAME  ) * getScale();
+    let rad = HEX_RADIUS_GAME * getScale();
 
     CTX.arc(hex_centre.x, hex_centre.y, rad, 0, Math.PI * 2, false);
   }
