@@ -179,13 +179,8 @@ function makeStartingPosition() {
   }
 }
 
-const threePlayerNeutral = (h) =>
-  (h.q === 0 && h.r === 0) ||
-  (h.q === 0 && h.r > h.s) ||
-  (h.r === 0 && h.s > h.q) ||
-  (h.s === 0 && h.q > h.r);
-
 function makeStartingPositionThreePlayer() {
+  COLORS[0][0] = NEUTRAL;  // Centre tile is neutral
   for (const i in [0, 1, 2]) {
     wedgeDir = Hex.directions[2 * i];
     coords = LAYOUT.hexToPixel(wedgeDir.scale(10));
