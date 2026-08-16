@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 
 <head>
   <title>Hex mode</title>
@@ -7,18 +7,18 @@
   <link rel="icon" type="image/png" href="/favicon.png">
   <meta name="viewport" content="width=device-width">
   <meta name="description" content="Pong wars in Hex mode by whichoneiwonder">
-<!-- Open Graph properties -->
+  <!-- Open Graph properties -->
   <meta property="og:title" content="Hex mode" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://pong-wars-hex.whichoneiwonder.com/" />
   <meta property="og:image" content="https://pong-wars-hex.whichoneiwonder.com/hero3.png" />
   <meta property="og:description" content="Pong wars in Hex mode by whichoneiwonder" />
-<!-- Twitter -->
+  <!-- Twitter -->
   <meta name="twitter:card" content="https://pong-wars-hex.whichoneiwonder.com/hero3.png">
   <meta name="twitter:title" content="Hex mode">
   <meta name="twitter:description" content="Pong wars in Hex mode by whichoneiwonder">
   <meta name="twitter:image" content="https://pong-wars-hex.whichoneiwonder.com/hero3.png">
-<!-- Schema.org metadata -->
+  <!-- Schema.org metadata -->
   <meta name="robots" content="index, follow">
   <script type="application/ld+json">
   {
@@ -34,19 +34,26 @@
     body {
       margin: 0;
       padding: 0;
-      font-size: 16px; /*calc(max(16px, min(1.8em, 20px)));*/
+      font-size: 16px;
+      /*calc(max(16px, min(1.8em, 20px)));*/
       font-family: monospace;
     }
+
+    .foreground-canvas {
+      background-color: transparent;
+      z-index: 3;
+    }
+
     .three-player-background {
       background:
         radial-gradient(closest-side, transparent 90%, white),
-        conic-gradient( from 300deg, yellow 10deg, magenta 110deg 130deg, cyan 230deg 250deg,  yellow 350deg)
-        ;
-      background-blend-mode:hard-light, normal;
+        conic-gradient(from 300deg, yellow 10deg, magenta 110deg 130deg, cyan 230deg 250deg, yellow 350deg);
+      background-blend-mode: hard-light, normal;
       background-clip: border-box;
       color: transparent;
       border-radius: 50%;
     }
+
     .score-chip {
       text-align: center;
       margin: auto;
@@ -55,20 +62,25 @@
       border: 2px #172b36;
       color: #172b36;
     }
+
     .score-chip>*>a {
       color: #0e3449;
     }
+
     #container {
-      display: block;
+      /* display: block; */
       margin: auto;
       width: calc(min(80vh, 100vw));
       min-width: 200px;
       max-width: 1200px;
       min-height: 200px;
       max-height: 750px;
+      position: relative;
+      height: calc(min(80vh, 100vw));
     }
 
-    #pongCanvas {
+    canvas {
+      position: absolute;
       display: block;
       border-radius: 4px;
       overflow: hidden;
@@ -77,20 +89,24 @@
       height: 100%;
       /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); */
     }
+
     @media (prefers-color-scheme: dark) {
       body {
         background-color: black;
         color: white;
       }
+
       .three-player-background {
         background:
           radial-gradient(closest-side, transparent 80%, black),
-          conic-gradient( from 300deg, #eeff35 10deg, #ff35ee 110deg 130deg, #35eeff 230deg 250deg,  #eeff35 350deg)
-          ;
+          conic-gradient(from 300deg, #eeff35 10deg, #ff35ee 110deg 130deg, #35eeff 230deg 250deg, #eeff35 350deg);
+        z-index: 1;
       }
-      .score-chip{
+
+      .score-chip {
         color: #ffffff;
       }
+
       .score-chip>*>a {
         color: #81cfff;
       }
@@ -100,35 +116,34 @@
 
 <body>
   <div id="container">
-    <canvas id="pongCanvas" class="three-player-background" width="1200" height="1200"></canvas>
+    <canvas id="pongCanvas" class="foreground-canvas" width="1200" height="1200"></canvas>
+    <canvas id="backgroundCanvas" class="three-player-background" width="1200" height="1200"></canvas>
+  </div>
 
-    <div class="score-chip">
-      <div id="score"></div>
-      <p id="made">
-        made by whichoneiwonder
-        | source on <a href="https://github.com/whichoneiwonder/pong-wars-hex">github</a>
-        | inspired by <a href="https://github.com/vnglst/pong-wars">vnglst</a>
-      </p>
-      <p id="other-modes">
+  <div class="score-chip">
+    <div id="score"></div>
+    <p id="made">
+      made by whichoneiwonder
+      | source on <a href="https://github.com/whichoneiwonder/pong-wars-hex">github</a>
+      | inspired by <a href="https://github.com/vnglst/pong-wars">vnglst</a>
+    </p>
+    <p id="other-modes">
 
-        &nbsp;
-        <a href="?classic">classic mode</a>
-        &nbsp;|&nbsp;
+      &nbsp;
+      <a href="?classic">classic mode</a>
+      &nbsp;|&nbsp;
 
-        <a href="?ThreePlayer">three player</a>
-        &nbsp;|&nbsp;
+      <a href="?ThreePlayer">three player</a>
+      &nbsp;|&nbsp;
 
-        <a href="?SixPlayer">six players</a>
-        &nbsp;
-      </p>
+      <a href="?SixPlayer">six players</a>
+      &nbsp;
+    </p>
 
-    </div>
   </div>
   </div>
 </body>
-
 <script src="red-blob-hex/lib.js"></script>
 <script src="pong.js"></script>
-<!-- <script src="pong.js" ></script> -->
 
 </html>

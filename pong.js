@@ -22,8 +22,10 @@ const colorPalette = {
 // blatantly forked by whichoneiwonder
 
 const CANVAS = document.getElementById("pongCanvas");
+const BG_CANVAS = document.getElementById("backgroundCanvas");
 
-const CTX = CANVAS.getContext("2d");
+const BALL_CTX = CANVAS.getContext("2d");
+const HEX_CTX = BG_CANVAS.getContext("2d");
 const scoreElement = document.getElementById("score");
 
 // 1v1 team colors
@@ -46,11 +48,11 @@ const COLORS_3_BALLS = [
 ];
 
 // 6 player team colors
-const HSL_6_TEAM_COLORS = [10, 70, 130, 190, 250, 310].map(
-  (x) => `hsl(${x + 10}, 90%, 50%)`
+const HSL_6_TEAM_COLORS = [190, 250, 310, 10, 70, 130].map(
+  (x) => `hsl(${x + 25}, 100%, 60%)`
 );
-const HSL_6_BALL_COLORS = [190, 250, 310, 10, 70, 130].map(
-  (x) => `hsl(${x + 10}, 100%, 70%)`
+const HSL_6_BALL_COLORS = [10, 70, 130, 190, 250, 310].map(
+  (x) => `hsl(${x + 25}, 100%, 50%)`
 );
 
 const DEADSPACE = undefined;
@@ -318,11 +320,13 @@ function updateScoreElement() {
 
 function drawBall(ball) {
   let { x, y } = gamePointToCanvasPoint(new Point(ball.x, ball.y));
-  CTX.fillStyle = ball.c;
-  CTX.beginPath();
-  CTX.arc(x, y, getScale() * BALL_RADIUS_GAME, 0, Math.PI * 2, false);
-  CTX.fill();
-  CTX.closePath();
+  BALL_CTX.fillStyle = ball.c;
+  BALL_CTX.strokeStyle = "black";
+  BALL_CTX.lineWidth = 0.5;
+  BALL_CTX.beginPath();
+  BALL_CTX.arc(Math.floor(x), Math.floor(y), Math.floor(getScale() * BALL_RADIUS_GAME), 0, Math.PI * 2, false);
+  BALL_CTX.fill();
+  BALL_CTX.closePath();
 }
 
 function drawAroundBall(ball) {
@@ -331,7 +335,7 @@ function drawAroundBall(ball) {
   let hc = ballAsHex.round();
   let radius = (0.2 + BALL_RADIUS_GAME) * getScale();
   let { x, y } = gamePointToCanvasPoint(ballCentre);
-  CTX.clearRect(x - radius, y - radius, radius * 2, radius * 2);
+  BALL_CTX.clearRect(x - radius, y - radius, radius * 2, radius * 2);
 
   if (hc.len() <= MAP_RADIUS + 1) {
     drawHexagon(hc);
@@ -350,16 +354,16 @@ function drawAllHexagons() {
 function drawHexBackground() {
   let hex_centre = gamePointToCanvasPoint({ x: 50, y: 50 });
   let rad = HEX_RADIUS_GAME * (MAP_RADIUS - 1.7) * 2 * getScale();
-  CTX.beginPath();
+  HEX_CTX.beginPath();
   for (var i = 0; i < 6; i++) {
-    CTX.lineTo(
-      hex_centre.x + rad * Math.sin(ANGLE * i),
-      hex_centre.y + rad * Math.cos(ANGLE * i)
+    HEX_CTX.lineTo(
+      Math.floor(hex_centre.x + rad * Math.sin(ANGLE * i)),
+      Math.floor(hex_centre.y + rad * Math.cos(ANGLE * i))
     );
   }
-  CTX.fillStyle = colorPalette.NeutralSpace;
-  CTX.closePath();
-  CTX.fill();
+  HEX_CTX.fillStyle = colorPalette.NeutralSpace;
+  HEX_CTX.closePath();
+  HEX_CTX.fill();
 }
 function drawHexagon(hex, override_color = undefined) {
   let color = override_color || (COLORS[hex.q] || {})[hex.r] || DEADSPACE;
@@ -368,38 +372,35 @@ function drawHexagon(hex, override_color = undefined) {
   }
   let hex_centre = gamePointToCanvasPoint(LAYOUT.hexToPixel(hex));
 
-  CTX.lineWidth = 1;
-  CTX.strokeStyle = "transparent";
-  CTX.fillStyle = color;
+  HEX_CTX.lineWidth = 1;
+  HEX_CTX.strokeStyle = "transparent";
+  HEX_CTX.fillStyle = color;
 
   if (SOLID_HEX) {
-    CTX.strokeStyle = color;
+    HEX_CTX.strokeStyle = color;
   }
-  CTX.beginPath();
+  HEX_CTX.beginPath();
   if (true) {
     let rad = HEX_RADIUS_GAME * getScale();
     for (var i = 0; i < 6; i++) {
-      CTX.lineTo(
-        hex_centre.x + rad * Math.cos(ANGLE * i),
-        hex_centre.y + rad * Math.sin(ANGLE * i)
+      HEX_CTX.lineTo(
+        Math.floor(hex_centre.x + rad * Math.cos(ANGLE * i)),
+        Math.floor(hex_centre.y + rad * Math.sin(ANGLE * i))
       );
     }
   } else {
     let rad = HEX_RADIUS_GAME * getScale();
 
-    CTX.arc(hex_centre.x, hex_centre.y, rad, 0, Math.PI * 2, false);
+    HEX_CTX.arc(Math.floor(hex_centre.x), Math.floor(hex_centre.y), rad, 0, Math.PI * 2, false);
   }
-  CTX.closePath();
-  CTX.fill();
-  CTX.stroke();
+  HEX_CTX.closePath();
+  HEX_CTX.fill();
+  HEX_CTX.stroke();
 }
 function firstDraw() {
-  // updateScoreElement();
-  // drawHexBackground();
   drawAllHexagons();
 }
 function draw() {
-  // updateScoreElement();
   while (true) {
     let r = RECENTS.pop();
     if (!r) {
@@ -407,8 +408,10 @@ function draw() {
     }
     drawHexagon(r);
   }
+  BALL_CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+
   BALLS.forEach((ball) => {
-    drawAroundBall(ball);
+    // drawAroundBall(ball);
     updateSquareAndBounce(ball);
     updateBall(ball);
   });
