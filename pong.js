@@ -34,7 +34,6 @@ const TEAM1_BALL = colorPalette.NocturnalExpedition;
 
 const TEAM2 = colorPalette.NocturnalExpedition;
 const TEAM2_BALL = colorPalette.MysticMint;
-
 // 3 player team colors
 const COLORS_3_TEAMS = [
   colorPalette.Yellow,
@@ -60,7 +59,8 @@ const HIT = colorPalette.Forsythia;
 const NEUTRAL = colorPalette.NeutralSpace;
 // const NEUTRAL = colorPalette.NullSpace;
 const CLASSIC_MODE = window.location.search.toLowerCase() === "?classic";
-const SOLID_HEX = CLASSIC_MODE || !window.location.hash;
+const SOLID_HEX = CLASSIC_MODE || !window.location.hash;  // if not solid, then there are gaps between hexes.
+const USE_HEX_BORDER = false;
 const ANGLE = (Math.PI * 2) / 6;
 const HEX_RADIUS_GAME = SOLID_HEX ? 1 : 0.9;
 const BALL_RADIUS_GAME = 0.75;
@@ -322,14 +322,16 @@ function drawBall(ball) {
   let { x, y } = gamePointToCanvasPoint(new Point(ball.x, ball.y));
   BALL_CTX.fillStyle = ball.c;
   BALL_CTX.strokeStyle = "black";
-  BALL_CTX.lineWidth = 0.5;
+  BALL_CTX.lineWidth = 0.1;
   BALL_CTX.beginPath();
   BALL_CTX.arc(Math.floor(x), Math.floor(y), Math.floor(getScale() * BALL_RADIUS_GAME), 0, Math.PI * 2, false);
   BALL_CTX.fill();
+  BALL_CTX.stroke();
   BALL_CTX.closePath();
 }
 
 function drawAroundBall(ball) {
+  // Not needed with multi-canvas approach, but could be used if we want to draw the ball on the same canvas as the hexes.
   let ballCentre = new Point(ball.x, ball.y);
   let ballAsHex = LAYOUT.pixelToHex(ballCentre);
   let hc = ballAsHex.round();
@@ -353,7 +355,7 @@ function drawAllHexagons() {
 
 function drawHexBackground() {
   let hex_centre = gamePointToCanvasPoint({ x: 50, y: 50 });
-  let rad = HEX_RADIUS_GAME * (MAP_RADIUS - 1.7) * 2 * getScale();
+  let rad = HEX_RADIUS_GAME * (MAP_RADIUS - 1.75) * 2 * getScale();
   HEX_CTX.beginPath();
   for (var i = 0; i < 6; i++) {
     HEX_CTX.lineTo(
@@ -362,6 +364,8 @@ function drawHexBackground() {
     );
   }
   HEX_CTX.fillStyle = colorPalette.NeutralSpace;
+  HEX_CTX.strokeStyle = colorPalette.NeutralSpace;
+
   HEX_CTX.closePath();
   HEX_CTX.fill();
 }
@@ -372,30 +376,25 @@ function drawHexagon(hex, override_color = undefined) {
   }
   let hex_centre = gamePointToCanvasPoint(LAYOUT.hexToPixel(hex));
 
-  HEX_CTX.lineWidth = 1;
-  HEX_CTX.strokeStyle = "transparent";
-  HEX_CTX.fillStyle = color;
+  HEX_CTX.lineWidth = 0.05 * getScale();
 
-  if (SOLID_HEX) {
-    HEX_CTX.strokeStyle = color;
+  HEX_CTX.fillStyle = color;
+  HEX_CTX.strokeStyle = color;
+  
+  HEX_CTX.strokeStyle = "black";
+  if (USE_HEX_BORDER) {
   }
   HEX_CTX.beginPath();
-  if (true) {
-    let rad = HEX_RADIUS_GAME * getScale();
-    for (var i = 0; i < 6; i++) {
-      HEX_CTX.lineTo(
-        Math.floor(hex_centre.x + rad * Math.cos(ANGLE * i)),
-        Math.floor(hex_centre.y + rad * Math.sin(ANGLE * i))
-      );
-    }
-  } else {
-    let rad = HEX_RADIUS_GAME * getScale();
-
-    HEX_CTX.arc(Math.floor(hex_centre.x), Math.floor(hex_centre.y), rad, 0, Math.PI * 2, false);
+  const rad = Math.ceil(HEX_RADIUS_GAME * getScale());
+  for (var i = 0; i < 6; i++) {
+    HEX_CTX.lineTo(
+      Math.floor(hex_centre.x + rad * Math.cos(ANGLE * i)),
+      Math.floor(hex_centre.y + rad * Math.sin(ANGLE * i))
+    );
   }
   HEX_CTX.closePath();
-  HEX_CTX.fill();
   HEX_CTX.stroke();
+  HEX_CTX.fill();
 }
 function firstDraw() {
   drawAllHexagons();
@@ -408,6 +407,7 @@ function draw() {
     }
     drawHexagon(r);
   }
+  // clear the ball context and redraw all balls, since they can move around and overlap each other
   BALL_CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 
   BALLS.forEach((ball) => {
